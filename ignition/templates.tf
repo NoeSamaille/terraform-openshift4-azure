@@ -41,7 +41,7 @@ networking:
 platform:
   azure:
     region: ${var.azure_region}
-    baseDomainResourceGroupName: ${var.azure_dns_resource_group_name}
+    %{if var.byo_dns == false}baseDomainResourceGroupName: ${var.azure_dns_resource_group_name} %{endif}
     networkResourceGroupName: ${var.network_resource_group_name}
     virtualNetwork: ${var.virtual_network_name}
     controlPlaneSubnet: ${var.control_plane_subnet}
