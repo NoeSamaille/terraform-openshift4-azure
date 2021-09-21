@@ -232,7 +232,7 @@ data "azurerm_resource_group" "network" {
 }
 
 resource "azurerm_storage_account" "cluster" {
-  name                     = "cluster${var.cluster_name}${random_string.cluster_id.result}"
+  name                     = "cluster${replace(var.cluster_name, "-", "")}${random_string.cluster_id.result}"
   resource_group_name      = data.azurerm_resource_group.main.name
   location                 = var.azure_region
   account_tier             = "Standard"
