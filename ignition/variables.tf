@@ -170,3 +170,18 @@ variable "byo_dns" {
   type    = bool
   default = false
 }
+
+variable "preexisting_storage_account" {
+  type    = bool
+  default = false
+}
+
+variable "storage_account_name" {
+  type    = string
+  default = ""
+}
+
+variable "storage_resource_group" {
+  type    = string
+  default = ""
+}

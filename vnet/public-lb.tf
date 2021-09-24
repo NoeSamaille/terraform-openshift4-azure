@@ -5,9 +5,9 @@ locals {
 
 locals {
   // DEBUG: Azure apparently requires dual stack LB for v6
-  need_public_ipv4 = ! var.private || ! var.outbound_udr
+  need_public_ipv4 = !var.private || !var.outbound_udr
 
-  need_public_ipv6 = var.use_ipv6 && (! var.private || ! var.outbound_udr)
+  need_public_ipv6 = var.use_ipv6 && (!var.private || !var.outbound_udr)
 }
 
 
@@ -96,21 +96,21 @@ resource "azurerm_lb" "public" {
 resource "azurerm_lb_backend_address_pool" "public_lb_pool_v4" {
   count = local.need_public_ipv4 ? 1 : 0
 
-  resource_group_name = var.resource_group_name
-  loadbalancer_id     = azurerm_lb.public.id
-  name                = var.cluster_id
+  # resource_group_name = var.resource_group_name
+  loadbalancer_id = azurerm_lb.public.id
+  name            = var.cluster_id
 }
 
 resource "azurerm_lb_backend_address_pool" "public_lb_pool_v6" {
   count = local.need_public_ipv6 ? 1 : 0
 
-  resource_group_name = var.resource_group_name
-  loadbalancer_id     = azurerm_lb.public.id
-  name                = "${var.cluster_id}-IPv6"
+  # resource_group_name = var.resource_group_name
+  loadbalancer_id = azurerm_lb.public.id
+  name            = "${var.cluster_id}-IPv6"
 }
 
 resource "azurerm_lb_rule" "public_lb_rule_api_internal_v4" {
-  count = var.use_ipv4 && ! var.private ? 1 : 0
+  count = var.use_ipv4 && !var.private ? 1 : 0
 
   name                           = "api-internal-v4"
   resource_group_name            = var.resource_group_name
@@ -127,7 +127,7 @@ resource "azurerm_lb_rule" "public_lb_rule_api_internal_v4" {
 }
 
 resource "azurerm_lb_rule" "public_lb_rule_api_internal_v6" {
-  count = var.use_ipv6 && ! var.private ? 1 : 0
+  count = var.use_ipv6 && !var.private ? 1 : 0
 
   name                           = "api-internal-v6"
   resource_group_name            = var.resource_group_name
@@ -144,7 +144,7 @@ resource "azurerm_lb_rule" "public_lb_rule_api_internal_v6" {
 }
 
 resource "azurerm_lb_outbound_rule" "public_lb_outbound_rule_v4" {
-  count = var.use_ipv4 && var.private && ! var.outbound_udr ? 1 : 0
+  count = var.use_ipv4 && var.private && !var.outbound_udr ? 1 : 0
 
   name                    = "outbound-rule-v4"
   resource_group_name     = var.resource_group_name
@@ -158,7 +158,7 @@ resource "azurerm_lb_outbound_rule" "public_lb_outbound_rule_v4" {
 }
 
 resource "azurerm_lb_outbound_rule" "public_lb_outbound_rule_v6" {
-  count = var.use_ipv6 && var.private && ! var.outbound_udr ? 1 : 0
+  count = var.use_ipv6 && var.private && !var.outbound_udr ? 1 : 0
 
   name                    = "outbound-rule-v6"
   resource_group_name     = var.resource_group_name

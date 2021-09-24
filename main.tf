@@ -72,6 +72,8 @@ locals {
   public_ssh_key                    = var.openshift_ssh_key == "" ? tls_private_key.installkey[0].public_key_openssh : file(var.openshift_ssh_key)
   major_version                     = join(".", slice(split(".", var.openshift_version), 0, 2))
   rhcos_image                       = lookup(lookup(jsondecode(data.http.images.body), "azure"), "url")
+  storage_account_name              = var.preexisting_storage_account ? data.azurerm_storage_account.cluster[0].name : azurerm_storage_account.cluster[0].name
+  vhd_name                          = var.preexisting_storage_account ? "vhd${local.cluster_id}" : "vhd"
 }
 
 module "vnet" {
@@ -137,6 +139,9 @@ module "ignition" {
   proxy_config                  = var.proxy_config
   trust_bundle                  = var.openshift_additional_trust_bundle
   byo_dns                       = var.openshift_byo_dns
+  preexisting_storage_account   = var.preexisting_storage_account
+  storage_account_name          = var.azure_storage_account_name
+  storage_resource_group        = var.azure_storage_resource_group
 }
 
 module "bootstrap" {
@@ -154,7 +159,7 @@ module "bootstrap" {
   ilb_backend_pool_v4_id = module.vnet.internal_lb_backend_pool_v4_id
   ilb_backend_pool_v6_id = module.vnet.internal_lb_backend_pool_v6_id
   tags                   = local.tags
-  storage_account        = azurerm_storage_account.cluster
+  storage_account        = var.preexisting_storage_account ? data.azurerm_storage_account.cluster[0] : azurerm_storage_account.cluster[0]
   nsg_name               = module.vnet.cluster_nsg_name
   private                = module.vnet.private
   outbound_udr           = var.azure_outbound_user_defined_routing
@@ -180,7 +185,7 @@ module "master" {
   ilb_backend_pool_v6_id = module.vnet.internal_lb_backend_pool_v6_id
   subnet_id              = module.vnet.master_subnet_id
   instance_count         = var.master_count
-  storage_account        = azurerm_storage_account.cluster
+  storage_account        = var.preexisting_storage_account ? data.azurerm_storage_account.cluster[0] : azurerm_storage_account.cluster[0]
   os_volume_type         = var.azure_master_root_volume_type
   os_volume_size         = var.azure_master_root_volume_size
   private                = module.vnet.private
@@ -232,6 +237,8 @@ data "azurerm_resource_group" "network" {
 }
 
 resource "azurerm_storage_account" "cluster" {
+  count = var.preexisting_storage_account ? 0 : 1
+
   name                     = "cluster${replace(var.cluster_name, "-", "")}${random_string.cluster_id.result}"
   resource_group_name      = data.azurerm_resource_group.main.name
   location                 = var.azure_region
@@ -239,6 +246,12 @@ resource "azurerm_storage_account" "cluster" {
   account_replication_type = "LRS"
 }
 
+data "azurerm_storage_account" "cluster" {
+  count = var.preexisting_storage_account ? 1 : 0
+
+  name                = var.azure_storage_account_name
+  resource_group_name = var.azure_storage_resource_group
+}
 resource "azurerm_user_assigned_identity" "main" {
   resource_group_name = data.azurerm_resource_group.main.name
   location            = data.azurerm_resource_group.main.location
@@ -262,13 +275,13 @@ resource "azurerm_role_assignment" "network" {
 
 # copy over the vhd to cluster resource group and create an image using that
 resource "azurerm_storage_container" "vhd" {
-  name                 = "vhd"
-  storage_account_name = azurerm_storage_account.cluster.name
+  name                 = local.vhd_name
+  storage_account_name = local.storage_account_name
 }
 
 resource "azurerm_storage_blob" "rhcos_image" {
   name                   = "rhcos${random_string.cluster_id.result}.vhd"
-  storage_account_name   = azurerm_storage_account.cluster.name
+  storage_account_name   = local.storage_account_name
   storage_container_name = azurerm_storage_container.vhd.name
   type                   = "Page"
   source_uri             = local.rhcos_image
@@ -302,6 +315,6 @@ if [[ "${var.azure_private}" == "false" ]]; then
   az network public-ip delete -g ${data.azurerm_resource_group.main.name} -n ${local.cluster_id}-bootstrap-pip-v4
 fi
 az network nic delete -g ${data.azurerm_resource_group.main.name} -n ${local.cluster_id}-bootstrap-nic
-EOF    
+EOF
   }
 }

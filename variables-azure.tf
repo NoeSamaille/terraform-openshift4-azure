@@ -291,3 +291,32 @@ variable "openshift_byo_dns" {
   type        = bool
   default     = false
 }
+
+variable "preexisting_storage_account" {
+  type    = bool
+  default = false
+}
+
+variable "azure_storage_account_name" {
+  description = "Existing Storage Account Name"
+  type        = string
+  default     = ""
+}
+
+variable "azure_storage_resource_group" {
+  description = "Existing Storage Account Resource Group"
+  type        = string
+  default     = ""
+}
+
+# variable "rh_coreos_vhd_url" {
+#   description = "Existing coreos VHD location"
+#   type        = string
+#   default     = ""
+# }
+
+# variable "azure_storage_vhd_container_name" {
+#   description = "Existing Storage Account Container Name"
+#   type        = string
+#   default     = ""
+# }
