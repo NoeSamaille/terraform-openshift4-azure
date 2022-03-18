@@ -1,7 +1,8 @@
+# Manually ignored files
+*.ignore*
+
 #  Local .terraform directories
 **/.terraform/*
-
-
 
 # .tfstate files
 *.tfstate

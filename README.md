@@ -10,7 +10,9 @@ This [terraform](terraform.io) implementation will deploy OpenShift 4.x into an 
 
 2. [Create a Service Principal](https://github.com/openshift/installer/blob/d0f7654bc4a0cf73392371962aef68cd9552b5dd/docs/user/azure/credentials.md) with proper IAM roles
 
-3. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+3. Install [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+4. Get your [OpenShift installer pull secret](https://console.redhat.com/openshift/install/pull-secret) and save it in `./pull-secret`
 
 ## Minimal TFVARS file
 
@@ -45,7 +47,7 @@ azure_client_secret    = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
 | machine_v4_cidrs                      | IPv4 CIDR for OpenShift VNET                                   | \[10.0.0.0/16\] | list   |
 | machine_v6_cidrs                      | IPv6 CIDR for OpenShift VNET                                   | \[\]               | list   |
 | base_domain                           | DNS name for your deployment                                   | -               | string |
-| azure_base_domain_resource_group_name | Resource group where DNS is hosted.  Must be on zame region.   | -               | string |
+| azure_base_domain_resource_group_name | Resource group where DNS is hosted.  Must be on same region.   | -               | string |
 | azure_bootstrap_vm_type               | Size of bootstrap VM                                           | Standard_D4s_v3 | string |
 | azure_master_vm_type                  | Size of master node VMs                                        | Standard_D4s_v3 | string |
 | azure_infra_vm_type                   | Size of infra node VMs                                         | Standard_D4s_v3 | string |
@@ -58,7 +60,7 @@ azure_client_secret    = "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
 | azure_worker_root_volume_size         | Size of worker node root volume                                | 128             | string |
 | azure_infra_root_volume_size          | Size of infra node root volume                                 | 128             | string |
 | azure_master_root_volume_type         | Storage type for master root volume                            | Premium_LRS     | string |
-| openshift_version                     | Version of OpenShift to deploy.                                | 4.6.13          | strig |
+| openshift_version                     | Version of OpenShift to deploy.                                | 4.8.33          | string |
 | bootstrap_completed                   | Control variable to delete bootstrap node after initialization | false           | bool |
 | azure_private                         | If set to `true` will deploy `api` and `*.apps` endpoints as private LoadBalancers | - | bool |
 | azure_extra_tags                      | Extra Azure tags to be applied to created resources            | {}              | map |

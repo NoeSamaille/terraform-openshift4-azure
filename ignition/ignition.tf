@@ -59,7 +59,7 @@ resource "azurerm_storage_container" "ignition" {
 }
 
 locals {
-  installer_workspace     = "${path.root}/installer-files/"
+  installer_workspace     = "${path.root}/installer-files"
   openshift_installer_url = "${var.openshift_installer_url}/${var.openshift_version}"
   cluster_nr              = join("", split("-", var.cluster_id))
 }
