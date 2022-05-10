@@ -22,13 +22,13 @@ variable "azure_region" {
 variable "azure_bootstrap_vm_type" {
   type        = string
   description = "Instance type for the bootstrap node. Example: `Standard_DS4_v3`."
-  default     = "Standard_D4s_v3"
+  default     = "Standard_D4s_v5"
 }
 
 variable "azure_master_vm_type" {
   type        = string
   description = "Instance type for the master node(s). Example: `Standard_D8s_v3`."
-  default     = "Standard_D8s_v3"
+  default     = "Standard_D8s_v5"
 }
 
 variable "azure_extra_tags" {
@@ -248,12 +248,12 @@ variable "infra_count" {
 
 variable "azure_infra_vm_type" {
   type    = string
-  default = "Standard_D4s_v3"
+  default = "Standard_D4s_v5"
 }
 
 variable "azure_worker_vm_type" {
   type    = string
-  default = "Standard_D8s_v3"
+  default = "Standard_D4s_v5"
 }
 
 variable "airgapped" {
